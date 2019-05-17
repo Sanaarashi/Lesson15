@@ -6,7 +6,8 @@ export let form = () => {
     };
 
     let form = document.querySelectorAll('form'),
-        inputs = document.querySelectorAll('input'),
+        inputs = form[0].querySelectorAll('input'),
+        mInps = form[1].querySelectorAll('input'),
         statusMessage = document.createElement('div');
 
     statusMessage.classList.add('status');
@@ -28,6 +29,14 @@ export let form = () => {
         event.preventDefault();
         event.target.appendChild(statusMessage);
         let formData = new FormData(event.target);
+
+        let obj = {};
+
+        formData.forEach((v,k) => {
+            obj[k] = v;
+        });
+
+        let json = JSON.stringify(obj);
 
         let postData = (data) => {
 
@@ -57,9 +66,12 @@ export let form = () => {
             for (let i = 0; i < inputs.length; i++) {
                 inputs[i].value = '';
             }
+            for (let i = 0; i < mInps.length; i++) {
+                mInps[i].value = '';
+            }
         };
 
-        postData(formData)
+        postData(json)
             .then(() => statusMessage.innerHTML = message.loading)
             .then(() => statusMessage.innerHTML = message.success)
             .catch(() => statusMessage.innerHTML = message.failure)

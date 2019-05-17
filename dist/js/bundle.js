@@ -148,7 +148,8 @@ let form = () => {
     };
 
     let form = document.querySelectorAll('form'),
-        inputs = document.querySelectorAll('input'),
+        inputs = form[0].querySelectorAll('input'),
+        mInps = form[1].querySelectorAll('input'),
         statusMessage = document.createElement('div');
 
     statusMessage.classList.add('status');
@@ -170,6 +171,14 @@ let form = () => {
         event.preventDefault();
         event.target.appendChild(statusMessage);
         let formData = new FormData(event.target);
+
+        let obj = {};
+
+        formData.forEach((v,k) => {
+            obj[k] = v;
+        });
+
+        let json = JSON.stringify(obj);
 
         let postData = (data) => {
 
@@ -199,9 +208,12 @@ let form = () => {
             for (let i = 0; i < inputs.length; i++) {
                 inputs[i].value = '';
             }
+            for (let i = 0; i < mInps.length; i++) {
+                mInps[i].value = '';
+            }
         };
 
-        postData(formData)
+        postData(json)
             .then(() => statusMessage.innerHTML = message.loading)
             .then(() => statusMessage.innerHTML = message.success)
             .catch(() => statusMessage.innerHTML = message.failure)
@@ -223,18 +235,24 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "modal", function() { return modal; });
 let modal = () => {
     let container = document.querySelector('body'),
-        overlay = document.querySelector('.overlay');
+        overlay = document.querySelector('.overlay'),
+        targetObj;
 
-    let setParameters = (a, b) => {
-        overlay.style.display = a;
-        document.body.style.overflow = b;
+    let setParameters = (overlayShown, overflowShown, classListMethod, fourthArg) => {
+        if (classListMethod == 'add') targetObj = fourthArg;
+        if (!fourthArg) fourthArg = targetObj;
+        overlay.style.display = overlayShown;
+        document.body.style.overflow = overflowShown;
+        fourthArg.classList[classListMethod]('more-splash');
     };
 
     container.addEventListener('click', (event) => {
-        if (event.target.classList == 'description-btn' || event.target.classList == 'more') {
-            setParameters('block', 'hidden');
-        } else if (event.target.classList == 'popup-close') {
-            setParameters('none', '');
+        let target = event.target;
+
+        if (target.classList.contains('description-btn') || target.classList.contains('more')) {
+            setParameters('block', 'hidden', 'add', target);
+        } else if (target.classList.contains('popup-close')) {
+            setParameters('none', '', 'remove');
         }
     });
 };
@@ -259,9 +277,8 @@ let slider = () => {
         dotsWrap = document.querySelector('.slider-dots'),
         dots = document.querySelectorAll('.dot');
 
-    showSlides(slideIndex);
 
-    function showSlides(n) {
+    const showSlides = (n) => {
         if (n > slides.length) {
             slideIndex = 1;
         }
@@ -274,31 +291,33 @@ let slider = () => {
 
         slides[slideIndex - 1].style.display = 'block';
         dots[slideIndex - 1].classList.add('dot-active');
-    }
+    };
 
-    function plusSlides(n) {
+    const plusSlides = (n) => {
         showSlides(slideIndex += n);
-    }
+    };
 
-    function currentSlide(n) {
+    const currentSlide = (n) => {
         showSlides(slideIndex = n);
-    }
+    };
 
-    prev.addEventListener('click', function () {
+    prev.addEventListener('click', () => {
         plusSlides(-1);
     });
 
-    next.addEventListener('click', function () {
+    next.addEventListener('click', () => {
         plusSlides(1);
     });
 
-    dotsWrap.addEventListener('click', function (event) {
+    dotsWrap.addEventListener('click', (event) => {
         for (let i = 0; i < dots.length + 1; i++) {
             if (event.target.classList.contains('dot') && event.target == dots[i - 1]) {
                 currentSlide(i);
             }
         }
     });
+
+    showSlides(slideIndex);
 };
 
 /***/ }),
